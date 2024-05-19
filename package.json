@@ -15,7 +15,7 @@
 		"android",
 		"ios"
 	],
-	"author": "saschi123, Inc. <cordova-plugin-chooser@cyph.com> (https://github.com/cyph)",
+	"author": "saschi123",
 	"license": "Apache-2.0",
 	"bugs": {
 		"url": "https://github.com/saschi123/cordova-plugin-folder-chooser/issues"
