@@ -83,12 +83,6 @@ function getFileInternal(accept, includeData, pickFolders, allowMultiple, succes
 }
 
 module.exports = {
-    getFile: function (accept, successCallback, failureCallback) {
-        return getFileInternal(accept, true, false, false, successCallback, failureCallback);
-    },
-    getFileMetadata: function (accept, successCallback, failureCallback) {
-        return getFileInternal(accept, false, false, false, successCallback, failureCallback);
-    },
     getFolder: function (accept, allowMultiple, successCallback, failureCallback) {
         return getFileInternal(accept, false, true, allowMultiple, successCallback, failureCallback);
     }
