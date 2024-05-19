@@ -13,6 +13,7 @@ import org.json.JSONArray;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.io.UnsupportedEncodingException;
 
 public class Chooser extends CordovaPlugin {
     private static final String ACTION_OPEN_DIRECTORY = "getDirectory";
@@ -73,7 +74,7 @@ public class Chooser extends CordovaPlugin {
             final String docId = DocumentsContract.getDocumentId(uri);
             final String[] split = docId.split(":");
             final String type = split[0];
-    
+
             if ("primary".equalsIgnoreCase(type)) {
                 try {
                     String path = URLDecoder.decode(split[1], StandardCharsets.UTF_8.name());
@@ -86,5 +87,4 @@ public class Chooser extends CordovaPlugin {
         }
         return null;
     }
-
 }
