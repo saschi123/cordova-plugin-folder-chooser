@@ -7,8 +7,6 @@ import android.net.Uri;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.PluginResult;
-import org.json.JSONArray;
-import org.json.JSONException;
 
 public class Chooser extends CordovaPlugin {
     private static final String ACTION_OPEN_DIRECTORY = "getDirectory";
@@ -31,20 +29,16 @@ public class Chooser extends CordovaPlugin {
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) {
-        try {
-            if (ACTION_OPEN_DIRECTORY.equals(action)) {
-                this.chooseDirectory(callbackContext);
-                return true;
-            }
-        } catch (JSONException e) {
-            callbackContext.error("Execution failed: " + e.getMessage());
+        if (ACTION_OPEN_DIRECTORY.equals(action)) {
+            this.chooseDirectory(callbackContext);
+            return true;
         }
         return false;
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == PICK_DIRECTORY_REQUEST && callbackContext != null) {
+        if (requestCode == PICK_DIRECTORY_REQUEST && this.callbackContext != null) {
             if (resultCode == Activity.RESULT_OK && data != null) {
                 Uri uri = data.getData();
 
