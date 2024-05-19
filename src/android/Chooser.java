@@ -13,7 +13,6 @@ import org.json.JSONArray;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.io.UnsupportedEncodingException;
 
 public class Chooser extends CordovaPlugin {
     private static final String ACTION_OPEN_DIRECTORY = "getDirectory";
@@ -58,7 +57,8 @@ public class Chooser extends CordovaPlugin {
                     if (filePath != null) {
                         callbackContext.success("file://" + filePath);
                     } else {
-                        callbackContext.error("Failed to convert URI to file path.");
+                        // If conversion failed, return the URI itself
+                        callbackContext.success(uri.toString());
                     }
                 } else {
                     callbackContext.error("Directory URI was null.");
@@ -70,20 +70,18 @@ public class Chooser extends CordovaPlugin {
     }
 
     private static String getPathFromUri(final Context context, final Uri uri) {
-        if (DocumentsContract.isDocumentUri(context, uri)) {
-            final String docId = DocumentsContract.getDocumentId(uri);
-            final String[] split = docId.split(":");
-            final String type = split[0];
+        final String docId = DocumentsContract.getDocumentId(uri);
+        final String[] split = docId.split(":");
+        final String type = split[0];
 
-            if ("primary".equalsIgnoreCase(type)) {
-                try {
-                    String path = URLDecoder.decode(split[1], StandardCharsets.UTF_8.name());
-                    return Environment.getExternalStorageDirectory() + "/" + path;
-                } catch (UnsupportedEncodingException e) {
-                    // This should never happen with UTF-8 encoding.
-                    e.printStackTrace();
-                }
-            }
+        if ("primary".equalsIgnoreCase(type)) {
+            String path = URLDecoder.decode(split[1], StandardCharsets.UTF_8.name());
+            return Environment.getExternalStorageDirectory() + "/" + path;
+        } else if ("home".equalsIgnoreCase(type)) {
+            String path = URLDecoder.decode(split[1], StandardCharsets.UTF_8.name());
+            return Environment.getExternalStorageDirectory() + "/Documents/" + path;
+        } else if ("raw".equalsIgnoreCase(type)) {
+            return URLDecoder.decode(split[1], StandardCharsets.UTF_8.name());
         }
         return null;
     }
