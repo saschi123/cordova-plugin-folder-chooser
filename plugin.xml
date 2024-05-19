@@ -13,11 +13,11 @@
 	</js-module>
 
 	<platform name="android">
-		<source-file src="src/android/Chooser.java" target-dir="src/com/cyph/cordova" />
+		<source-file src="src/android/Chooser.java" target-dir="src/com/folderchooser/cordova" />
 
 		<config-file target="config.xml" parent="/*">
 			<feature name="Chooser">
-				<param name="android-package" value="com.cyph.cordova.Chooser" />
+				<param name="android-package" value="com.folder.cordova.Chooser" />
 			</feature>
 		</config-file>
 	</platform>
