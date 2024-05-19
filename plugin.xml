@@ -6,7 +6,7 @@
 	version="1.0.0"
 >	
 	<name>Chooser</name>
-	<author>Ihcsas123.</author>
+	<author>saschi123.</author>
 
 	<js-module src="www/chooser.js" name="Chooser">
 		<clobbers target="chooser" />
