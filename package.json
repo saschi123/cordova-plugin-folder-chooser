@@ -15,13 +15,13 @@
 		"android",
 		"ios"
 	],
-	"author": "Cyph, Inc. <cordova-plugin-chooser@cyph.com> (https://github.com/cyph)",
+	"author": "saschi123, Inc. <cordova-plugin-chooser@cyph.com> (https://github.com/cyph)",
 	"license": "Apache-2.0",
 	"bugs": {
-		"url": "https://github.com/cyph/cordova-plugin-chooser/issues"
+		"url": "https://github.com/saschi123/cordova-plugin-folder-chooser/issues"
 	},
 	"cordova": {
-		"id": "cordova-plugin-chooser",
+		"id": "cordova-plugin-folder-chooser",
 		"platforms": [
 			"android",
 			"ios"
