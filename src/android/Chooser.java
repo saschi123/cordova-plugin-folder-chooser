@@ -73,12 +73,18 @@ public class Chooser extends CordovaPlugin {
             final String docId = DocumentsContract.getDocumentId(uri);
             final String[] split = docId.split(":");
             final String type = split[0];
-
+    
             if ("primary".equalsIgnoreCase(type)) {
-                String path = URLDecoder.decode(split[1], StandardCharsets.UTF_8.toString());
-                return Environment.getExternalStorageDirectory() + "/" + path;
+                try {
+                    String path = URLDecoder.decode(split[1], StandardCharsets.UTF_8.name());
+                    return Environment.getExternalStorageDirectory() + "/" + path;
+                } catch (UnsupportedEncodingException e) {
+                    // This should never happen with UTF-8 encoding.
+                    e.printStackTrace();
+                }
             }
         }
         return null;
     }
+
 }
