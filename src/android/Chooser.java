@@ -1,8 +1,12 @@
 package com.folder.cordova;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
+import android.provider.DocumentsContract;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.PluginResult;
@@ -47,7 +51,13 @@ public class Chooser extends CordovaPlugin {
                     cordova.getActivity().getContentResolver().takePersistableUriPermission(uri,
                         Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
 
-                    callbackContext.success(uri.toString());
+                    // Attempt to convert the URI to a file path
+                    String filePath = getPathFromUri(cordova.getActivity(), uri);
+                    if (filePath != null) {
+                        callbackContext.success("file://" + filePath);
+                    } else {
+                        callbackContext.success(uri.toString()); // Fallback to sending the content URI
+                    }
                 } else {
                     callbackContext.error("Directory URI was null.");
                 }
@@ -55,5 +65,18 @@ public class Chooser extends CordovaPlugin {
                 callbackContext.error("Directory selection was cancelled or failed.");
             }
         }
+    }
+
+    private static String getPathFromUri(final Context context, final Uri uri) {
+        if (DocumentsContract.isDocumentUri(context, uri) && "com.android.externalstorage.documents".equals(uri.getAuthority())) {
+            final String docId = DocumentsContract.getDocumentId(uri);
+            final String[] split = docId.split(":");
+            final String type = split[0];
+
+            if ("primary".equalsIgnoreCase(type)) {
+                return Environment.getExternalStorageDirectory() + "/" + split[1];
+            }
+        }
+        return null;
     }
 }
