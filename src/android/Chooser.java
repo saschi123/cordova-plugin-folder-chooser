@@ -1,4 +1,4 @@
-package com.cyph.cordova;
+package com.folder.cordova;
 
 import android.app.Activity;
 import android.content.Intent;
