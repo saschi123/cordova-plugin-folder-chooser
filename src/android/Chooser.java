@@ -4,13 +4,15 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
+
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 public class Chooser extends CordovaPlugin {
     private static final String ACTION_OPEN_DIRECTORY = "getDirectory";
@@ -51,12 +53,11 @@ public class Chooser extends CordovaPlugin {
                     cordova.getActivity().getContentResolver().takePersistableUriPermission(uri,
                         Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
 
-                    // Attempt to convert the URI to a file path
                     String filePath = getPathFromUri(cordova.getActivity(), uri);
                     if (filePath != null) {
                         callbackContext.success("file://" + filePath);
                     } else {
-                        callbackContext.success(uri.toString()); // Fallback to sending the content URI
+                        callbackContext.error("Failed to convert URI to file path.");
                     }
                 } else {
                     callbackContext.error("Directory URI was null.");
@@ -68,13 +69,14 @@ public class Chooser extends CordovaPlugin {
     }
 
     private static String getPathFromUri(final Context context, final Uri uri) {
-        if (DocumentsContract.isDocumentUri(context, uri) && "com.android.externalstorage.documents".equals(uri.getAuthority())) {
+        if (DocumentsContract.isDocumentUri(context, uri)) {
             final String docId = DocumentsContract.getDocumentId(uri);
             final String[] split = docId.split(":");
             final String type = split[0];
 
             if ("primary".equalsIgnoreCase(type)) {
-                return Environment.getExternalStorageDirectory() + "/" + split[1];
+                String path = URLDecoder.decode(split[1], StandardCharsets.UTF_8.toString());
+                return Environment.getExternalStorageDirectory() + "/" + path;
             }
         }
         return null;
