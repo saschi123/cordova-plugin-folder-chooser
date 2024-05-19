@@ -1,11 +1,11 @@
 {
-	"name": "cordova-plugin-chooser",
-	"version": "1.3.2",
+	"name": "cordova-plugin-folder-chooser",
+	"version": "1.0.0",
 	"description": "Cordova file chooser plugin",
 	"main": "index.js",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/cyph/cordova-plugin-chooser.git"
+		"url": "git+https://github.com/saschi123/cordova-plugin-folder-chooser.git"
 	},
 	"keywords": [
 		"file",
