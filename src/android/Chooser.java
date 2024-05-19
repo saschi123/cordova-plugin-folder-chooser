@@ -3,10 +3,12 @@ package com.cyph.cordova;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
-
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.PluginResult;
+import org.json.JSONArray;
+import org.json.JSONException;
+
 
 public class Chooser extends CordovaPlugin {
     private static final String ACTION_OPEN_DIRECTORY = "getDirectory";
