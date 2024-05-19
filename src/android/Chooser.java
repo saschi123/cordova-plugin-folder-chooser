@@ -1,59 +1,97 @@
-package com.folder.cordova;
+package com.example.myapp;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.net.Uri;
-import org.apache.cordova.CallbackContext;
-import org.apache.cordova.CordovaPlugin;
-import org.apache.cordova.PluginResult;
-import org.json.JSONArray;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Environment;
+import android.provider.DocumentsContract;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
-public class Chooser extends CordovaPlugin {
-    private static final String ACTION_OPEN_DIRECTORY = "getDirectory";
-    private static final int PICK_DIRECTORY_REQUEST = 1;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
-    private CallbackContext callbackContext;
+public class MainActivity extends Activity {
 
-    public void chooseDirectory(CallbackContext callbackContext) {
+    private static final int PICK_DIRECTORY_REQUEST_CODE = 1;
+    private static final int PERMISSIONS_REQUEST_CODE = 2;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        Button pickFolderButton = findViewById(R.id.pickFolderButton);
+        pickFolderButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !checkStoragePermission()) {
+                    requestPermissions();
+                } else {
+                    openDirectoryChooser();
+                }
+            }
+        });
+    }
+
+    private void openDirectoryChooser() {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
         intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        startActivityForResult(intent, PICK_DIRECTORY_REQUEST_CODE);
+    }
 
-        cordova.startActivityForResult(this, intent, PICK_DIRECTORY_REQUEST);
+    private boolean checkStoragePermission() {
+        return ContextCompat.checkSelfPermission(this,
+            Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED;
+    }
 
-        PluginResult pluginResult = new PluginResult(PluginResult.Status.NO_RESULT);
-        pluginResult.setKeepCallback(true);
-        this.callbackContext = callbackContext;
-        callbackContext.sendPluginResult(pluginResult);
+    private void requestPermissions() {
+        ActivityCompat.requestPermissions(this,
+            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+            PERMISSIONS_REQUEST_CODE);
     }
 
     @Override
-    public boolean execute(String action, JSONArray args, CallbackContext callbackContext) {
-        if (ACTION_OPEN_DIRECTORY.equals(action)) {
-            this.chooseDirectory(callbackContext);
-            return true;
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSIONS_REQUEST_CODE && grantResults.length > 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            openDirectoryChooser();
         }
-        return false;
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == PICK_DIRECTORY_REQUEST && this.callbackContext != null) {
-            if (resultCode == Activity.RESULT_OK && data != null) {
-                Uri uri = data.getData();
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PICK_DIRECTORY_REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null) {
+            Uri uri = data.getData();
+            String filePath = getPath(this, uri);
 
-                if (uri != null) {
-                    // Persist access permissions.
-                    cordova.getActivity().getContentResolver().takePersistableUriPermission(uri,
-                        Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-
-                    callbackContext.success(uri.toString());
-                } else {
-                    callbackContext.error("Directory URI was null.");
-                }
+            if (filePath != null) {
+                Log.d("File Path", filePath);
             } else {
-                callbackContext.error("Directory selection was cancelled or failed.");
+                Log.d("File Path", "Path conversion not possible");
             }
         }
+    }
+
+    public static String getPath(final Context context, final Uri uri) {
+        if (DocumentsContract.isDocumentUri(context, uri) && "com.android.externalstorage.documents".equals(uri.getAuthority())) {
+            final String docId = DocumentsContract.getDocumentId(uri);
+            final String[] split = docId.split(":");
+            final String type = split[0];
+            if ("primary".equalsIgnoreCase(type)) {
+                return Environment.getExternalStorageDirectory() + "/" + split[1];
+            }
+        }
+        return null;
     }
 }
