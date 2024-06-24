@@ -1,4 +1,4 @@
-/** @see sodiumutil */
+// Converts a base64 string to a Uint8Array
 function from_base64(sBase64, nBlocksSize) {
     function _b64ToUint6(nChr) {
         return nChr > 64 && nChr < 91 ? nChr - 65 :
@@ -29,16 +29,11 @@ function from_base64(sBase64, nBlocksSize) {
     return taBytes;
 }
 
+// Handles file/folder selection
 function getFileInternal(accept, includeData, pickFolders, allowMultiple, successCallback, failureCallback) {
     var args = [accept, includeData, pickFolders, allowMultiple];
 
-    var result = new Promise(function (resolve, reject) {
-        cordova.exec(resolve, reject, 'Chooser', 'getDirectory', args);
-    });
-
-    result.then(successCallback).catch(failureCallback);
-
-    return result;
+    cordova.exec(successCallback, failureCallback, 'Chooser', 'getFile', args);
 }
 
 module.exports = {
