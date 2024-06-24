@@ -3,6 +3,8 @@ package com.folder.cordova;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
+
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.PluginResult;
@@ -14,7 +16,7 @@ public class Chooser extends CordovaPlugin {
 
     private CallbackContext callbackContext;
 
-    public void chooseDirectory(CallbackContext callbackContext) {
+    private void chooseDirectory(CallbackContext callbackContext) {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
         intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -29,10 +31,12 @@ public class Chooser extends CordovaPlugin {
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) {
+        Log.d("ChooserPlugin", "Action received: " + action);  // Log action received
         if (ACTION_OPEN_DIRECTORY.equals(action)) {
             this.chooseDirectory(callbackContext);
             return true;
         }
+        Log.d("ChooserPlugin", "Invalid action: " + action);  // Log invalid action
         return false;
     }
 
